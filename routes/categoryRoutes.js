@@ -2,11 +2,14 @@ import express from "express";
 import { isAdmin, requireSignIn } from "./../middlewares/authMiddleware.js";
 import {
   categoryControlller,
+  categoryPhotoController,
   createCategoryController,
   deleteCategoryCOntroller,
   singleCategoryController,
   updateCategoryController,
 } from "./../controllers/categoryController.js";
+//added
+import formidable from "express-formidable";
 
 const router = express.Router();
 
@@ -16,6 +19,8 @@ router.post(
   "/create-category",
   requireSignIn,
   isAdmin,
+  //added
+  formidable(),
   createCategoryController
 );
 
@@ -40,5 +45,7 @@ router.delete(
   isAdmin,
   deleteCategoryCOntroller
 );
+
+router.get("/category-photo/:cid", categoryPhotoController);
 
 export default router;

@@ -1,8 +1,45 @@
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
+import fs from "fs";
+
+// export const createCategoryController = async (req, res) => {
+//   try {
+//     const { name } = req.body;
+
+//     if (!name) {
+//       return res.status(401).send({ message: "Name is required" });
+//     }
+//     const existingCategory = await categoryModel.findOne({ name });
+//     if (existingCategory) {
+//       return res.status(200).send({
+//         success: false,
+//         message: "Category Already Exisits",
+//       });
+//     }
+//     const category = await new categoryModel({
+//       name,
+//       slug: slugify(name),
+//     }).save();
+//     res.status(201).send({
+//       success: true,
+//       message: "new category created",
+//       category,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).send({
+//       success: false,
+//       error,
+//       message: "Errro in Category",
+//     });
+//   }
+// }; 
+
 export const createCategoryController = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name } = req.fields;
+    const { photo } = req.files;
+
     if (!name) {
       return res.status(401).send({ message: "Name is required" });
     }
@@ -10,27 +47,36 @@ export const createCategoryController = async (req, res) => {
     if (existingCategory) {
       return res.status(200).send({
         success: false,
-        message: "Category Already Exisits",
+        message: "Category Already Exists",
       });
     }
-    const category = await new categoryModel({
+
+    const category = new categoryModel({
       name,
       slug: slugify(name),
-    }).save();
+    });
+
+    if (photo) {
+      category.photo.data = fs.readFileSync(photo.path);
+      category.photo.contentType = photo.type;
+    }
+
+    await category.save();
     res.status(201).send({
       success: true,
-      message: "new category created",
+      message: "New category created",
       category,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      errro,
-      message: "Errro in Category",
+      error,
+      message: "Error in Category",
     });
   }
 };
+
 
 //update category
 export const updateCategoryController = async (req, res) => {
@@ -109,6 +155,25 @@ export const deleteCategoryCOntroller = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "error while deleting category",
+      error,
+    });
+  }
+};
+
+//added
+// get photo
+export const categoryPhotoController = async (req, res) => {
+  try {
+    const category = await categoryModel.findById(req.params.cid).select("photo");
+    if (category.photo.data) {
+      res.set("Content-type", category.photo.contentType);
+      return res.status(200).send(category.photo.data);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Erorr while getting photo",
       error,
     });
   }

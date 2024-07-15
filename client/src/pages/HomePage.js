@@ -115,6 +115,11 @@ const HomePage = () => {
                 onChange={(e) => handleFilter(e.target.checked, c._id)}
               >
                 {c.name}
+                <img
+                    src={`/api/v1/category/category-photo/${c._id}`}
+                    className="card-img-top"
+                    alt={c.name}
+                  />
               </Checkbox>
             ))}
           </div>
