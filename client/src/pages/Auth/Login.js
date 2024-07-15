@@ -13,7 +13,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // form function
+  // form functions
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
